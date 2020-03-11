@@ -49,17 +49,14 @@ class AutoResponseView(BaseListView):
 
     def get_queryset(self):
         """Get QuerySet from cached widget."""
-        kwargs = {
-            model_field_name: self.request.GET.get(form_field_name)
-            for form_field_name, model_field_name in self.widget.dependent_fields.items()
-            if form_field_name in self.request.GET and self.request.GET.get(form_field_name, '') != ''
-        }
-        kwargs += {
-            model_field_name: self.request.GET.get('{0}[]'.format(form_field_name))
-            for form_field_name, model_field_name in self.widget.dependent_fields.items()
-            if '{0}[]'.format(form_field_name) in self.request.GET
-               and self.request.GET.get('{0}[]'.format(form_field_name), '') != ''
-        }
+        kwargs = {}
+        for form_field_name, model_field_name in self.widget.dependent_fields.items:
+            if_array = '{0}[]'.format(form_field_name)
+            if form_field_name in self.request.GET and self.request.GET.get(form_field_name, '') != '':
+                kwargs[model_field_name] = self.request.GET.get(form_field_name)
+
+            elif if_array in self.request.GET and self.request.GET.get(if_array, '') != '':
+                kwargs[if_array] = self.request.GET.get(if_array)
 
         return self.widget.filter_queryset(self.request, self.term, self.queryset, **kwargs)
 
